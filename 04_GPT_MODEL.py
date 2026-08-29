@@ -24,7 +24,7 @@ while True:
         )
     else:
         interaction = client.interactions.create(
-            model="gemini-3.7-flash",
+            model="gemini-3.5-flash",
             input=user_input,
             previous_interaction_id=previous_id
         )
