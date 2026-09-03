@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}History | CarboNova{% endblock %}
+{% block content %}
+<div class="page-content"><div class="page-heading"><div><p class="eyebrow">HISTORY</p><h1>Assessments & outcomes</h1><p class="muted">Every analysis becomes part of your decision trail.</p></div><a class="button button-primary" href="{{ url_for('dashboard') }}">Back to dashboard</a></div>
+<div class="panel table-panel">{% if rows %}<div class="table-wrap"><table><thead><tr><th>Date</th><th>Carbon</th><th>Energy</th><th>Water</th><th>Predicted reduction</th><th>Actual</th><th>Status</th></tr></thead><tbody>
+{% for row in rows %}<tr><td>{{ row['created_at'][:10] }}</td><td><b>{{ '%.1f'|format(row['total_carbon']) }}</b> kg</td><td>{{ '%.0f'|format(row['electricity_kwh']) }} kWh</td><td>{{ '%.0f'|format(row['water_liters']) }} L</td><td>{{ '%.1f'|format(row['predicted_reduction']) }} kg</td><td>{% if row['actual_reduction'] is not none %}{{ '%.1f'|format(row['actual_reduction']) }} kg{% else %}—{% endif %}</td><td><span class="status-pill">{{ row['status'] }}</span></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-small"><h3>No assessments yet</h3><p>Run your first analysis from the dashboard.</p></div>{% endif %}</div></div>
+{% endblock %}

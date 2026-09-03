@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}CarboNova | Adaptive Climate Impact Optimizer{% endblock %}
+{% block public_content %}
+<div class="landing">
+<header class="landing-nav">
+  <div class="brand"><img class="brand-logo" src="{{ url_for('static', filename='img_logo.png') }}" alt="CarboNova"></div>
+  <div class="landing-actions"><a class="text-link" href="#about">About</a><a class="button button-outline" href="{{ url_for('login') }}">Log in</a><a class="button button-primary" href="{{ url_for('signup') }}">Create account</a></div>
+</header>
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">SUSTAINABILITY & CLIMATE</p>
+    <h1>CarboNova</h1>
+    <h2>An AI-Powered Adaptive Climate Impact Optimizer</h2>
+    <p class="hero-text">Turn environmental data into practical decisions. CarboNova analyzes energy, water, fuel, waste and operational data to recommend actions, estimate impact and verify what actually happened.</p>
+    <div class="hero-buttons"><a class="button button-primary button-large" href="{{ url_for('signup') }}">Create your account</a><a class="button button-outline button-large" href="#about">Explore the solution</a></div>
+  </div>
+  <div class="hero-visual"><div class="orb"></div><div class="floating-card card-a"><span>Impact</span><strong>Measure</strong></div><div class="floating-card card-b"><span>Decision engine</span><strong>Optimize</strong></div><div class="floating-card card-c"><span>Outcome</span><strong>Verify</strong></div></div>
+</section>
+<section class="about-section" id="about">
+  <div class="section-label">01 / ABOUT</div>
+  <div><h3>From dashboards to decisions.</h3><p>Organizations already have environmental and operational data, but monitoring alone does not tell them which intervention is best. CarboNova closes that gap with transparent calculations, prediction, multi-objective optimization and AI-assisted reasoning.</p></div>
+</section>
+<section class="feature-grid">
+  <article><span>01</span><h4>Measure</h4><p>Calculate modeled carbon and resource impact from operational inputs.</p></article>
+  <article><span>02</span><h4>Optimize</h4><p>Rank interventions using impact, cost and implementation considerations.</p></article>
+  <article><span>03</span><h4>Act</h4><p>Give users clear, prioritized actions instead of passive reports.</p></article>
+  <article><span>04</span><h4>Verify</h4><p>Compare predicted benefit with the measured outcome after implementation.</p></article>
+</section>
+<section class="creators"><div class="section-label">02 / CREATORS</div><h3>Built by the team behind CarboNova.</h3><div class="creator-list"><div>V. Pavan Vigyan</div><div>Ruka Pavan Krishna Reddy</div><div>Padarthi Sai Anirudh</div><div>N. Vidyuth Hariharan</div></div></section>
+<footer class="landing-footer"><div class="brand"><img class="brand-logo" src="{{ url_for('static', filename='img_logo.png') }}" alt="CarboNova"></div><span>An AI-Powered Adaptive Climate Impact Optimizer</span></footer>
+</div>
+{% endblock %}

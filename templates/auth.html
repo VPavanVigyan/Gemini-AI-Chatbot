@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode == 'signup' else 'Log in' }} | CarboNova{% endblock %}
+{% block public_content %}
+<div class="auth-page">
+<a href="{{ url_for('index') }}" class="auth-brand"><img class="brand-logo auth-logo" src="{{ url_for('static', filename='img_logo.png') }}" alt="CarboNova"></a>
+<div class="auth-card">
+<p class="eyebrow">CARBONOVA</p>
+<h1>{{ 'Create your account' if mode == 'signup' else 'Welcome back' }}</h1>
+<p class="muted">{{ 'Start turning environmental data into decisions.' if mode == 'signup' else 'Continue to your climate impact dashboard.' }}</p>
+{% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+<form method="post" class="form">
+{% if mode == 'signup' %}<label>Full name<input name="name" required autocomplete="name" placeholder="Your name"></label>{% endif %}
+<label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
+<label>Password<input type="password" name="password" required minlength="6" autocomplete="{{ 'new-password' if mode == 'signup' else 'current-password' }}" placeholder="Minimum 6 characters"></label>
+<button class="button button-primary button-large" type="submit">{{ 'Create account' if mode == 'signup' else 'Log in' }}</button>
+</form>
+<p class="switch-auth">{% if mode == 'signup' %}Already have an account? <a href="{{ url_for('login') }}">Log in</a>{% else %}New to CarboNova? <a href="{{ url_for('signup') }}">Create an account</a>{% endif %}</p>
+</div></div>
+{% endblock %}

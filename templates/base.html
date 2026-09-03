@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}CarboNova{% endblock %}</title>
+<meta name="description" content="CarboNova — An AI-Powered Adaptive Climate Impact Optimizer">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if current_user %}
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+  <div class="brand-mini"><img class="brand-logo" src="{{ url_for('static', filename='img_logo.png') }}" alt="CarboNova"></div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+    <a href="{{ url_for('history') }}" class="nav-link">History</a>
+    <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+  </nav>
+  <div class="sidebar-bottom"><a href="{{ url_for('logout') }}" class="nav-link">Log out</a></div>
+</aside>
+<main class="main-area">
+<header class="topbar">
+  <button class="hamburger" id="menuButton" aria-label="Open menu"><span></span><span></span><span></span></button>
+  <div class="topbar-spacer"></div>
+  <div class="user-menu"><div class="avatar">{{ current_user['name'][0]|upper }}</div><span class="user-name">{{ current_user['name'] }}</span><a class="logout-text" href="{{ url_for('logout') }}">Logout</a></div>
+</header>
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</main>
+</div>
+{% else %}
+{% block public_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

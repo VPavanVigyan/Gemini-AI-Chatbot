@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | CarboNova{% endblock %}
+{% block content %}
+<div class="page-content">
+<div class="page-heading"><div><p class="eyebrow">CLIMATE DECISION CENTER</p><h1>Good to see you, {{ current_user['name'].split()[0] }}.</h1><p class="muted">Measure impact, choose an intervention and verify the result.</p></div><button class="button button-primary" onclick="openModal('dataModal')">+ New assessment</button></div>
+
+{% if not latest %}
+<section class="empty-dashboard"><img src="{{ url_for('static', filename='img_logo.png') }}"
+     alt="CarboNova"
+     class="empty-state-logo"><h2>Your decision center starts here.</h2><p>Add energy, water, fuel, waste and solar data. CarboNova will calculate impact and produce prioritized interventions.</p><button class="button button-primary" onclick="openModal('dataModal')">Add first assessment</button></section>
+{% else %}
+<section class="kpi-grid">
+<div class="kpi"><span>Modeled carbon</span><strong>{{ '%.1f'|format(latest['total_carbon']) }}</strong><small>kg CO₂e</small></div>
+<div class="kpi"><span>Predicted reduction</span><strong>{{ '%.1f'|format(latest['predicted_reduction']) }}</strong><small>kg CO₂e</small></div>
+<div class="kpi"><span>Energy</span><strong>{{ '%.0f'|format(latest['electricity_kwh']) }}</strong><small>kWh</small></div>
+<div class="kpi"><span>Water</span><strong>{{ '%.0f'|format(latest['water_liters']) }}</strong><small>litres</small></div>
+</section>
+
+<section class="dashboard-grid">
+<div class="panel chart-panel"><div class="panel-head"><div><span class="panel-kicker">TREND</span><h3>Carbon impact history</h3></div><span class="status-pill">{{ latest['status'] }}</span></div><canvas id="historyChart"></canvas></div>
+<div class="panel"><div class="panel-head"><div><span class="panel-kicker">DECISION</span><h3>Top interventions</h3></div></div><div class="recommendation-list">
+{% for r in recommendations %}
+<div class="recommendation"><div class="rec-top"><span class="priority {{ r['priority']|lower }}">{{ r['priority'] }}</span><span>{{ r['category'] }}</span></div><h4>{{ r['title'] }}</h4><p><b>Current condition:</b> {{ r['current_condition'] or r['reason'] }}</p><p>{{ r['action'] }}</p><div class="rec-meta"><b>Expected impact: {{ r['expected_impact'] or ('↓ ' ~ ('%.1f'|format(r['estimated_reduction'])) ~ ' kg CO₂e') }}</b><span>{{ r['cost_level'] }} cost · {{ r['implementation'] }} implementation</span></div></div>
+{% endfor %}
+</div></div>
+</section>
+
+<section class="panel optimization-panel">
+<div class="panel-head"><div><span class="panel-kicker">ADAPTIVE OPTIMIZATION</span><h3>Condition → action → impact</h3><p class="muted">Recommendations are ranked using environmental benefit, relative cost, feasibility and operating priority.</p></div></div>
+<div class="table-wrap">
+<table class="optimization-table">
+<thead><tr><th>Current condition</th><th>Recommended action</th><th>Expected impact</th><th>Cost / feasibility</th><th>Priority</th></tr></thead>
+<tbody>
+{% for r in recommendations %}
+<tr>
+<td>{{ r['current_condition'] or r['reason'] }}</td>
+<td><strong>{{ r['title'] }}</strong><br><span>{{ r['action'] }}</span></td>
+<td>{{ r['expected_impact'] or ('↓ ' ~ ('%.1f'|format(r['estimated_reduction'])) ~ ' kg CO₂e') }}</td>
+<td>{{ r['cost_level'] }} / {{ r['implementation'] }}<br><small>Cost-benefit {{ r['cost_benefit_score'] or 0 }}</small></td>
+<td><span class="priority {{ r['priority']|lower }}">{{ r['priority'] }}</span></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="dashboard-grid lower">
+<div class="panel"><div class="panel-head"><div><span class="panel-kicker">WHAT-IF</span><h3>Test an intervention</h3></div></div><p class="muted">Use the latest assessment as the baseline and test changes before acting.</p>
+<div class="slider-row"><label>Electricity reduction <output id="elecOut">10%</output></label><input id="elecSlider" type="range" min="0" max="40" value="10"></div>
+<div class="slider-row"><label>Water reduction <output id="waterOut">10%</output></label><input id="waterSlider" type="range" min="0" max="40" value="10"></div>
+<div class="slider-row"><label>Additional solar <output id="solarOut">100 kWh</output></label><input id="solarSlider" type="range" min="0" max="1000" step="50" value="100"></div>
+<button class="button button-outline" onclick="runWhatIf()">Simulate impact</button><div id="whatIfResult" class="whatif-result"></div></div>
+
+<div class="panel"><div class="panel-head"><div><span class="panel-kicker">VERIFY</span><h3>Predicted vs actual</h3></div></div><p class="muted">After implementing an intervention, enter the measured reduction to close the feedback loop.</p>
+<div class="verify-box"><div><span>Predicted</span><strong>{{ '%.1f'|format(latest['predicted_reduction']) }} kg</strong></div><div><span>Actual measured</span><div class="inline-input"><input id="actualReduction" type="number" min="0" step="0.1" placeholder="0.0"><span>kg</span></div></div></div>
+<button class="button button-primary" onclick="verifyOutcome({{ latest['id'] }})">Verify outcome</button><div id="verifyResult" class="whatif-result"></div></div>
+</section>
+{% endif %}
+</div>
+
+<div class="modal-backdrop" id="dataModal"><div class="modal"><button class="modal-close" onclick="closeModal('dataModal')">×</button><p class="eyebrow">OPTIMAL VALUES</p><h2>Optimal values</h2><p class="muted optimal-note">These are target/example conditions for a sustainable campus. Use them as a reference, then replace them with your actual measured operating data.</p>
+<div class="optimal-grid">
+<div><span>Temperature</span><strong>23°C</strong></div><div><span>Electricity</span><strong>600 kWh/day</strong></div><div><span>Solar generation</span><strong>300 kWh/day</strong></div><div><span>Daylight</span><strong>85%</strong></div><div><span>Water</span><strong>10,000 L/day</strong></div><div><span>Air quality</span><strong>90/100</strong></div><div><span>Carbon intensity</span><strong>150 gCO₂e/kWh</strong></div><div><span>Occupancy</span><strong>400 people</strong></div><div><span>Operating hours</span><strong>8 h/day</strong></div>
+</div>
+<div class="form-section-title"><span class="eyebrow">ASSESSMENT INPUT</span><h3>Enter current operating data</h3></div>
+<form id="assessmentForm" class="form two-col">
+<label>Electricity (kWh/day)<input name="electricity_kwh" type="number" min="0" step="0.1" value="600" required></label>
+<label>Water (litres/day)<input name="water_liters" type="number" min="0" step="1" value="10000" required></label>
+<label>Fuel (litres/day) <small>Optional</small><input name="fuel_liters" type="number" min="0" step="0.1" placeholder="Optional" value=""></label>
+<label>Waste (kg/day) <small>Optional</small><input name="waste_kg" type="number" min="0" step="0.1" placeholder="Optional" value=""></label>
+<label>Solar generation (kWh/day)<input name="solar_kwh" type="number" min="0" step="0.1" value="300" required></label>
+<label>Occupancy (people)<input name="occupancy" type="number" min="0" step="1" value="400" required></label>
+<label>Temperature (°C)<input name="temperature" type="number" min="-50" max="60" step="0.1" value="23" required></label>
+<label>Daylight availability (%)<input name="daylight" type="number" min="0" max="100" step="1" value="85" required></label>
+<label>Air/environment quality (0–100)<input name="air_quality" type="number" min="0" max="100" step="1" value="90" required></label>
+<label>Electricity carbon intensity (gCO₂e/kWh)<input name="carbon_intensity" type="number" min="0" step="1" value="150" required></label>
+<label>Operating hours/day<input name="operating_hours" type="number" min="0" max="24" step="0.5" value="8" required></label>
+<label>Building/campus condition<select name="operating_condition"><option>Normal</option><option>Peak</option><option>Strained</option><option>High Load</option></select></label>
+<label class="full">Energy cost <small>Optional</small><input name="energy_cost" type="number" min="0" step="1" placeholder="Optional" value=""></label>
+<div class="full form-actions"><button type="button" class="button button-outline" onclick="closeModal('dataModal')">Cancel</button><button class="button button-primary" type="submit">Analyze & recommend</button></div>
+</form><div id="analysisStatus" class="analysis-status"></div></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const historyData={{ history|map(attribute='total_carbon')|list|tojson }};
+const historyLabels={{ history|map(attribute='created_at')|list|tojson }};
+if(document.getElementById('historyChart')){
+new Chart(document.getElementById('historyChart'),{type:'line',data:{labels:historyLabels.map(x=>new Date(x).toLocaleDateString()),datasets:[{label:'kg CO₂e',data:historyData,tension:.35,borderWidth:2,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{grid:{display:false}}}}});
+}
+</script>
+{% endblock %}
