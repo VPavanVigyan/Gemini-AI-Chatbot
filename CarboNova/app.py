@@ -340,6 +340,7 @@ def verify(assessment_id):
         "variance": round(actual - row["predicted_reduction"], 2)
     })
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
